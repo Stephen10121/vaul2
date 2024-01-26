@@ -33,6 +33,30 @@
         }, actuallAnimate ? 300 : 0);
     }
 
+    let top=40;
+    function moveMouse(event: MouseEvent) {
+        if (!expand) return;
+        top = Math.max(event.pageY-oldPosOffset, 20);
+    }
+    let oldPosOffset = 0;
+    function mouseDown(event:MouseEvent) {
+        expand = true;
+        oldPosOffset = event.offsetY;
+    }
+    let transitionTop = false;
+    function mouseUp() {
+        expand = false;
+
+        if (top > 100) {
+            close();
+        } else {
+            transitionTop=true;
+            top = 40;
+            setTimeout(() => transitionTop=false, 150);
+            console.log(translateY)
+        }
+    }
+
     onMount(() => {
         const isReduced = !(window.matchMedia(`(prefers-reduced-motion: reduce)`) as any as boolean === true || window.matchMedia(`(prefers-reduced-motion: reduce)`).matches === true);
         autoAnimate = isReduced;
@@ -42,14 +66,15 @@
             translateY = "0%"
         }, actuallAnimate ? 1 : 0);
     });
+
+    let expand = false;
 </script>
 
-<section class="outer {actuallAnimate ? "animate" : ""}" style="--backgroundColor:{backgroundColor};--translateY:{translateY};">
+<section class="outer {actuallAnimate ? "animate" : ""}" style="--backgroundColor:{backgroundColor};--translateY:{translateY};--topPos:{top}px;">
     <button class="closeBackground" on:click={close} />
-    <section class="inner">
+    <section class="inner {transitionTop && "transitionTop"}">
         <div class="header">
-            wow
-            <button on:click={close}>close</button>
+            <div class="slider {expand && "expand"}" on:mousedown={mouseDown} on:mouseup={mouseUp} on:mousemove={moveMouse} on:mouseleave={mouseUp} role="none" />
         </div>
         <div class="rest">
             <slot />
@@ -81,13 +106,17 @@
     .inner {
         position: absolute;
         left: 0;
-        top: 40px;
+        top: var(--topPos);
         height: calc(100% - 40px);
         width: 100%;
         background-color: white;
         transform: translateY(var(--translateY));
         border-top-right-radius: 10px;
         border-top-left-radius: 10px;
+    }
+
+    .outer.animate .inner.transitionTop {
+        transition: top 0.15s linear;
     }
 
     .outer.animate .inner {
@@ -100,5 +129,26 @@
         border: none;
         background: none;
         outline: none;
+    }
+
+    .header {
+        width: 100%;
+        height: 40px;
+        position: relative;
+    }
+
+    .slider {
+        background-color: rgba(255, 0, 0, 0.349);
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .slider.expand {
+        /* transform: translateY(-10px); */
+        transform: translateY(-600px);
+        height: 3000%;
     }
 </style>
