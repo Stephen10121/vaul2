@@ -14,7 +14,7 @@
     /**
      * This value plus the the default top of the drawer position will determine when the drawer will close when the user drags the drawer beyond this value.
      */
-    export let closeHeight = 200;
+    export let closeHeight = 150;
 
     /**
      * This value determines how far away the top of the drawer is from the top of the page.

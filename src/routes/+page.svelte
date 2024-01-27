@@ -44,4 +44,9 @@
     button:hover {
         background-color: #f7f7f7;
     }
+
+    :global(body) {
+        padding: 0;
+        margin: 0;
+    }
 </style>
