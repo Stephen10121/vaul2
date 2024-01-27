@@ -1,6 +1,6 @@
 {
 	"name": "slider-upper",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"scripts": {
 		"dev": "vite dev --host",
 		"build": "vite build && npm run package",
