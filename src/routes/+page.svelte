@@ -22,8 +22,8 @@
 <style>
     main {
         width: 100%;
-        height: 100vh;
-        height: 100dvh;
+        height: 200vh;
+        height: 200dvh;
         display: flex;
         align-items: center;
         justify-content: center;

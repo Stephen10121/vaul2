@@ -111,7 +111,7 @@
 
     function moveMouse(event: MouseEvent) {
         if (!expand) return;
-        top = Math.max(event.pageY-oldPosOffset, fromTop-userMinDragHeight);
+        top = Math.max(event.clientY-oldPosOffset, fromTop-userMinDragHeight);
     }
 
     function moveTouch(event: TouchEvent) {
@@ -128,7 +128,9 @@
         } else {
             transitionTop = actuallAnimate;
             top = fromTop;
-            setTimeout(() => transitionTop=false, actuallAnimate ? 150 : 0);
+            setTimeout(() => {
+                transitionTop=false;
+            }, actuallAnimate ? 150 : 0);
         }
     }
 
@@ -184,6 +186,9 @@
 </section>
 
 <style>
+    :global(body:has(.outer)) {
+        overflow: hidden;
+    }
     .outer {
         background-color: var(--backgroundColor);
         position: fixed;
@@ -192,6 +197,7 @@
         height: 100dvh;
         top: 0;
         left: 0;
+        z-index: 200;
     }
 
     .outer.animate {
@@ -289,7 +295,7 @@
         height: 3000%;
     }
 
-    :global(*:has(.slider.slider.expand)) {
+    :global(*:has(.slider.expand)) {
         overflow: hidden;
         -webkit-user-select: none;
         -khtml-user-select: none;
