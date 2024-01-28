@@ -66,6 +66,11 @@
      */
     export let borderColor: string | undefined = undefined;
 
+    /**
+     * Sets how long in milliseconds the phone will vibrate when the user closes the drawer. The min is 0 for no vibration, and the max is 200ms.
+     */
+    export let vibrationDuration = 40;
+
     export let theme: "system" | "light" | "dark" = "system";
 
     export let lightThemeColor = "#ffffff";
@@ -93,7 +98,7 @@
             window.navigator.vibrate(100);
             setTimeout(() => {
                 window.navigator.vibrate(0);
-            }, 10);
+            }, Math.min(vibrationDuration,200));
             dispatch("close");
         }, actuallAnimate ? 300 : 0);
     }
