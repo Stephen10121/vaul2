@@ -27,14 +27,14 @@
     export let userMinDragHeight = 20;
 
     /**
-     * Sets the maximum opacity of the background when the drawer is moving. Max value: 129, Min value: 0.
+     * Sets the maximum opacity of the background when the drawer is moving. Max value: 1, Min value: 0.
      */
-    export let maximumDark = 129;
+    export let maximumDark = 0.5;
 
     /**
-     * Sets the minimim opacity of the background when the drawer is moving. Max value: 129, Min value: 0.
+     * Sets the minimim opacity of the background when the drawer is moving. Max value: 1, Min value: 0.
      */
-    export let minimumDark = 20;
+    export let minimumDark = 0.2;
 
     /**
      * Set this to true if you want a close button in the header section.
@@ -61,8 +61,18 @@
      */
     export let isDraggable = true;
 
+    /**
+     * This supports all the color values like hex and rgb.
+     */
+    export let borderColor: string | undefined = undefined;
+
+    export let theme: "system" | "light" | "dark" = "system";
+
+    export let lightThemeColor = "#ffffff";
+    export let darkThemeColor = "#000000";
+
     const dispatch = createEventDispatcher();
-    let backgroundColor = "#00000000";
+    let backgroundColorOpacity = 0;
     let transitionTop = false;
     let translateY = "100%";
     let autoAnimate = true;
@@ -71,15 +81,19 @@
     let top = fromTop;
 
     function map_range(value: number, low1: number, high1: number, low2: number, high2: number) {
-        return Math.floor(low2 + (high2 - low2) * (value - low1) / (high1 - low1)).toString(16);
+        return low2 + (high2 - low2) * (value - low1) / (high1 - low1)
     }
 
     $: actuallAnimate = animate === "transition" ? true : animate === "auto" ? autoAnimate : false;
 
     function close() {
-        backgroundColor = "#00000000";
+        backgroundColorOpacity = 0;
         translateY = "100%";
         setTimeout(() => {
+            window.navigator.vibrate(100);
+            setTimeout(() => {
+                window.navigator.vibrate(0);
+            }, 10);
             dispatch("close");
         }, actuallAnimate ? 300 : 0);
     }
@@ -95,7 +109,7 @@
         if (top !== fromTop) {
             let minC = fromTop - userMinDragHeight;
             let maxC = window.innerHeight;
-            backgroundColor = `#000000${map_range(top, minC, maxC, maximumDark, minimumDark)}`;
+            backgroundColorOpacity = map_range(top, minC, maxC, maximumDark, minimumDark);
         }
     }
 
@@ -138,15 +152,15 @@
         autoAnimate = !(window.matchMedia(`(prefers-reduced-motion: reduce)`) as any as boolean === true || window.matchMedia(`(prefers-reduced-motion: reduce)`).matches === true);
 
         setTimeout(() => {
-            backgroundColor = "#00000081";
+            backgroundColorOpacity = maximumDark;
             translateY = "0%"
         }, actuallAnimate ? 1 : 0);
     });
 </script>
 
 <section
-    class="outer {actuallAnimate ? "animate" : ""}"
-    style="--backgroundColor:{backgroundColor};--translateY:{translateY};--topPos:{top}px;--topPosConst:{fromTop}px;{headerFont ? `--font:${headerFont}`: ""}"
+    class="outer {actuallAnimate ? "animate" : ""} {theme}"
+    style="--lightThemeColor:{lightThemeColor};--darkThemeColor:{darkThemeColor};--backgroundColorOpacity:{backgroundColorOpacity};--translateY:{translateY};--topPos:{top}px;--topPosConst:{fromTop}px;{headerFont ? `--font:${headerFont};`: ""}{borderColor?`--border-color:${borderColor};`:""}"
 >
     <button class="closeBackground" on:click={close} />
     <section class="inner {transitionTop && "transitionTop"}" id="inner">
@@ -190,7 +204,7 @@
         overflow: hidden;
     }
     .outer {
-        background-color: var(--backgroundColor);
+        background-color: rgba(0, 0, 0, var(--backgroundColorOpacity));
         position: fixed;
         width: 100vw;
         height: 100vh;
@@ -204,9 +218,31 @@
         transition: background-color 300ms linear;
     }
 
+    .outer.animate:has(.slider.expand) {
+        transition: background-color 0s linear;
+    }
+
     @media (prefers-reduced-motion: reduce) {
         .outer.animate {
             transition: background-color 0 linear !important;
+        }
+    }
+
+    .outer.dark .inner {
+        background-color: var(--darkThemeColor);
+    }
+
+    .outer.light .inner {
+        background-color: var(--lightThemeColor);
+    }
+
+    .outer.system .inner {
+        background-color: var(--darkThemeColor);
+    }
+
+    @media (prefers-color-scheme: light) {
+        .outer.system .inner {
+            background-color: var(--lightThemeColor);
         }
     }
 
@@ -216,11 +252,11 @@
         top: var(--topPos);
         height: calc(100% - var(--topPosConst));
         width: 100%;
-        background-color: white;
         transform: translateY(var(--translateY));
         border-top-right-radius: 10px;
         border-top-left-radius: 10px;
         overflow: visible !important;
+        outline: 2px solid var(--border-color);
     }
 
     .rest {

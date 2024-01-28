@@ -15,18 +15,26 @@
 </main>
 
 {#if showModal}
-    <Drawer on:close={() => showModal = false} closeDrawer={closeModalForce} showHeaderBar>
+    <Drawer
+        on:close={() => showModal = false}
+        closeDrawer={closeModalForce}
+        showHeaderBar
+        theme="light"
+    >
+    <!-- darkThemeColor="#1B1B1E" -->
     </Drawer>
 {/if}
 
 <style>
     main {
         width: 100%;
-        height: 200vh;
-        height: 200dvh;
+        height: 100vh;
+        height: 100dvh;
         display: flex;
         align-items: center;
         justify-content: center;
+        background-color: #373F51;
+        background-color: white;
     }
 
     button {
@@ -38,6 +46,7 @@
         border: 1px solid #adadad;
         background: none;
         cursor: pointer;
+        /* color: white; */
         transition: background 0.15s linear;
     }
 
